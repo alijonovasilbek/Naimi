@@ -1,5 +1,7 @@
 from rest_framework.routers import DefaultRouter
-from .views import RegisterView, VerifyView, PhoneTokenObtainView, CityView, ProfileViewSet, LoginView
+from .views import (RegisterView, VerifyView, PhoneTokenObtainView,
+                    CityView, ProfileViewSet, LoginView,
+                    ImageViewSet, VideoViewSet)
 
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -8,6 +10,8 @@ router = DefaultRouter()
 
 router.register(r'city', CityView, basename='city')
 router.register('profile', ProfileViewSet, basename='profile')
+router.register('profile-images', ImageViewSet, basename='image')
+router.register('profile-videos', VideoViewSet, basename='video')
 
 urlpatterns = router.urls
 

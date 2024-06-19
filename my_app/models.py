@@ -1,5 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import random
 import string
 
@@ -16,22 +17,35 @@ class City(models.Model):
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, phone, city):
+    def create_user(self, phone, password=None, city=None):
         if not phone:
-            raise ValueError("Userda tel raqam bo'lishi kerak")
+            raise ValueError('The Phone number field is required')
+        if not city:
+            raise ValueError('The City field is required')
+
         user = self.model(phone=phone, city=city)
+        if password:
+            user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, city):
-        user = self.create_user(phone, city)
+    def create_superuser(self, phone, password=None, city=None):
+        try:
+            city_instance = City.objects.get(id=city)
+        except City.DoesNotExist:
+            raise ValueError('The City with the given id does not exist')
+
+        user = self.create_user(phone=phone, password=password, city=city_instance)
         user.is_admin = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser):
+
+class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=255, unique=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
+    password = models.CharField(max_length=128)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -80,53 +94,27 @@ class ProfileModel(models.Model):
     class Meta:
         verbose_name = 'Profile'
         db_table = 'Profile_table'
-#
-#
-# class Profile(models.Model):
-#     first_name = models.CharField(max_length=255)
-#     last_name = models.CharField(max_length=255)
-#     bio = models.TextField()
-#     image = models.ImageField(upload_to="profile")
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return self.first_name
-#
-#     class Meta:
-#         verbose_name='Profile'
-#         db_table='Profile_table'
-#
-#
-# class ProfileImage(models.Model):
-#     image = models.ImageField(upload_to="profile")
-#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return self.profile.first_name
-#
-#     class Meta:
-#         verbose_name='ProfileImage'
-#         db_table='ProfileImage_table'
-#
-#
-# class ProfileVideo(models.Model):
-#     video = models.FileField(upload_to='profile_video')
-#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#
-#     def __str__(self):
-#         return self.profile.first_name
-#
-#     class Meta:
-#         verbose_name='ProfileVideo'
-#         db_table='ProfileVideo_table'
-#
-#
-# class Favourite(models.Model):
-#     owner = models.ForeignKey(Profile, related_name='favourites', on_delete=models.CASCADE)
-#     profiles = models.ForeignKey(Profile, related_name='favourited_by', on_delete=models.CASCADE)
-#
-#     class Meta:
-#         verbose_name='Favourite'
-#         db_table='Favourite_table'
-#
-#
+
+
+class ProfileImageModel(models.Model):
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='ProfileImages')
+
+    def __str__(self):
+        return self.image.name
+
+    class Meta:
+        db_table = 'profile_images'
+        verbose_name = 'Profile Images'
+
+
+class ProfileVideoModel(models.Model):
+    user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    video = models.FileField(upload_to='ProfileVideos')
+
+    def __str__(self):
+        return self.video.name
+
+    class Meta:
+        db_table = 'profile_videos'
+        verbose_name = 'Profile Videos'

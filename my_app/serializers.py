@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, City, ProfileModel
+from .models import User, City, ProfileModel, ProfileImageModel, ProfileVideoModel
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -37,3 +37,25 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=13)
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileImageModel
+        fields = '__all__'
+        extra_kwargs = {
+            'user_id': {
+                'read_only': True
+            }
+        }
+
+
+class VideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfileVideoModel
+        fields = '__all__'
+        extra_kwargs = {
+            'user_id': {
+                'read_only': True
+            }
+        }

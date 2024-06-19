@@ -2,18 +2,18 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
 
 
-from .permissons import Cheak
+from .permissons import Cheak, IsOwner
 from .serializers import RegistrationSerializer, VerificationSerializer, CitySerializer, ProfileSerializer, \
-    LoginSerializer
-from .models import PhoneVerification, User, City, ProfileModel
+    LoginSerializer, ImageSerializer, VideoSerializer
+from .models import PhoneVerification, User, City, ProfileModel, ProfileVideoModel, ProfileImageModel
 from .utils import send_sms
 from rest_framework.viewsets import ModelViewSet
 
@@ -129,6 +129,17 @@ class ProfileViewSet(ModelViewSet):
     permission_classes = [Cheak, ]
     parser_classes = (MultiPartParser, FormParser)
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
 
@@ -140,3 +151,54 @@ class ProfileViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class ImageViewSet(ModelViewSet):
+    queryset = ProfileImageModel.objects.all()
+    serializer_class = ImageSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def list(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            queryset = self.filter_queryset(self.get_queryset().filter(user_id=request.user.id))
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
+
+
+class VideoViewSet(ModelViewSet):
+    queryset = ProfileVideoModel.objects.all()
+    serializer_class = VideoSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def list(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            queryset = self.filter_queryset(self.get_queryset().filter(user_id=request.user.id))
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
+
+
+

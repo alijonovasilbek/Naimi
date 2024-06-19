@@ -11,3 +11,10 @@ class Cheak(BasePermission):
             return request.user.is_superuser
         else:
             return request.user == view.get_object().user_id
+
+
+class IsOwner(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in ("GET", "POST"):
+            return request.user
+        return request.user.is_superuser or request.user.id == view.get_object().user.id
