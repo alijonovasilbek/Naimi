@@ -137,3 +137,15 @@ ESKIZ_EMAIL = 'your_eskiz_email@example.com'
 ESKIZ_PASSWORD = 'your_eskiz_password'
 
 AUTH_USER_MODEL = 'my_app.User'
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+        }
+    }
+}

@@ -34,6 +34,7 @@ class User(AbstractBaseUser):
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
@@ -51,10 +52,12 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
+
 class PhoneVerification(models.Model):
-    phone = models.CharField(max_length=255, unique=True)
+    phone = models.CharField(max_length=255)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.phone} - {self.code}'
@@ -63,6 +66,20 @@ class PhoneVerification(models.Model):
         self.code = ''.join(random.choices(string.digits, k=6))
         self.save()
 
+
+class ProfileModel(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    bio = models.TextField()
+    image = models.ImageField(upload_to="profile")
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.first_name
+
+    class Meta:
+        verbose_name = 'Profile'
+        db_table = 'Profile_table'
 #
 #
 # class Profile(models.Model):
