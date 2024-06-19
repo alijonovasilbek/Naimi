@@ -46,7 +46,7 @@ class User(AbstractBaseUser):
 
     class Meta:
         verbose_name = 'User'
-        db_table = 'User_table'
+        db_table = 'users'
 
     @property
     def is_staff(self):
