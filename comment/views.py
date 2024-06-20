@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import FeedbackModel, FAQModel, FeedbackImageModel
 from .permissions import IsAdminOrReadOnly
-from .serializers import FeedbackSerializer, FAQsSerializer, FeedbackImageSerializer
+from .serializers import FeedbackSerializer, FAQsSerializer, FeedbackImageSerializer, GetFeedbackWithSubIdSerializer
 from users.models import ProfileModel
+from app_category.models import SubCategory
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
@@ -29,5 +30,7 @@ class FAQsViewSet(viewsets.ModelViewSet):
     serializer_class = FAQsSerializer
     permission_classes = [IsAdminOrReadOnly]
 
-# class GetFeedbackWithSubId(RetrieveAPIView):
-#     queryset =
+
+class GetFeedbackWithSubIdView(RetrieveAPIView):
+    queryset = SubCategory.objects.all()
+    serializer_class = GetFeedbackWithSubIdSerializer
