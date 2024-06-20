@@ -3,8 +3,10 @@ from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +15,7 @@ from app_category.models import SubCategory
 from .permissons import Cheak, IsOwner
 from .serializers import RegistrationSerializer, VerificationSerializer, CitySerializer, ProfileSerializer, \
     LoginSerializer, ImageSerializer, VideoSerializer, GetProfileWithSubIdSerializer
-from .models import PhoneVerification, User, City, ProfileModel, ProfileVideoModel, ProfileImageModel
+from .models import PhoneVerification, User, City, ProfileModel, ProfileVideoModel, ProfileImageModel, Favourite
 from .utils import send_sms
 from rest_framework.viewsets import ModelViewSet
 
@@ -221,5 +223,27 @@ class VideoViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
 
+
+class FavouriteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, req: Request):
+        user = req.user
+        favourites = Favourite.objects.get(owner_id=user)
+
+        return Response({'data': favourites.profiles_id.values()})
+
+    def post(self, req: Request):
+        try:
+            user = req.user
+            profile = ProfileModel.objects.get(user_id=req.data.get('profile'))
+            favourites = Favourite.objects.get(owner_id=user)
+        except:
+            return Response({'error': 'Profile was not found'})
+
+        favourites.profiles_id.add(profile)
+        favourites.save()
+
+        return Response({'msg': 'OK'}, status=200)
 
 

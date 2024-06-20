@@ -114,3 +114,12 @@ class ProfileVideoModel(models.Model):
     class Meta:
         db_table = 'profile_videos'
         verbose_name = 'Profile Videos'
+
+
+class Favourite(models.Model):
+    owner_id = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
+    profiles_id = models.ManyToManyField(ProfileModel, related_name='profiles', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.owner_id.phone
