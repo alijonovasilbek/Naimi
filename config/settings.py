@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt',
+    'corsheaders',
     # My apps
     "users",
     "app_category",
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -113,8 +116,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-STATIC_URL = "static/"
+# if DEBUG:
+#     STATICFILES_DIRS = [BASE_DIR / 'static', BASE_DIR / 'media']
+# else:
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -141,7 +151,7 @@ ESKIZ_API_URL = 'https://notify.eskiz.uz/api'
 ESKIZ_EMAIL = 'your_eskiz_email@example.com'
 ESKIZ_PASSWORD = 'your_eskiz_password'
 
-AUTH_USER_MODEL = 'my_app.User'
+AUTH_USER_MODEL = 'users.User'
 
 
 SWAGGER_SETTINGS = {

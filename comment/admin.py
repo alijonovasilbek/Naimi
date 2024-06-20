@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import FAQsModel, FeedbackModel, FeedbackImageModel
+from .models import FAQModel, FeedbackModel, FeedbackImageModel
 
 admin.site.register(FeedbackModel)
-admin.site.register(FAQsModel)
+admin.site.register(FAQModel)
 admin.site.register(FeedbackImageModel)

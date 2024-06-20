@@ -1,14 +1,14 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from users.models import ProfileModel
+
 
 from app_service.models import Service
 
-User = get_user_model()
+User = ProfileModel
 
 
 class FeedbackModel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='Owner')
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="User")
     msg = models.TextField()
     mark = models.IntegerField()
     created_at = models.DateField()
@@ -32,7 +32,7 @@ class FeedbackImageModel(models.Model):
         db_table = "FeedbackImage"
 
 
-class FAQsModel(models.Model):
+class FAQModel(models.Model):
     question = models.TextField()
     answer = models.TextField()
     role = models.BooleanField(default=False)

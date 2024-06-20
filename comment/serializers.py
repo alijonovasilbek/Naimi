@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import FeedbackModel, FAQsModel, FeedbackImageModel
+from .models import FeedbackModel, FAQModel, FeedbackImageModel
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -7,7 +7,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = FeedbackModel
         fields = '__all__'
         extra_kwargs = {
-            'to_user': {'read_only': True},
             'owner': {'read_only': True}
         }
 
@@ -20,5 +19,5 @@ class FeedbackImageSerializer(serializers.ModelSerializer):
 
 class FAQsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FAQsModel
+        model = FAQModel
         fields = '__all__'
