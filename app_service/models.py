@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from my_app.models import ProfileModel
+from users.models import ProfileModel
 
 User = get_user_model()
 

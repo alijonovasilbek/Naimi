@@ -1,5 +1,5 @@
 from app_service.models import Service
-from my_app.models import ProfileModel
+from users.models import ProfileModel
 from app_service.serializers import GetServiceSerializers, ServiceSerializers
 from rest_framework import viewsets, permissions
 
