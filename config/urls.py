@@ -28,8 +28,11 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path("admin/", admin.site.urls),
-    path("",include("my_app.urls"))
+   path("admin/", admin.site.urls),
+   path("",include("my_app.urls")),
+   path("", include("app_service.urls")),
+   path("", include("app_category.urls")),
+   path("", include("comment.urls"))
 ]
 
 

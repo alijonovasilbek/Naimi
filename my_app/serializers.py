@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User, City, ProfileModel, ProfileImageModel, ProfileVideoModel
+from app_category.models import SubCategory
+from app_service.models import Service
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -59,3 +61,24 @@ class VideoSerializer(serializers.ModelSerializer):
                 'read_only': True
             }
         }
+
+
+class GetProfileWithSubIdSerializer(serializers.ModelSerializer):
+    profiles = serializers.SerializerMethodField(method_name='get_profiles', read_only=True)
+    msg = serializers.SerializerMethodField(method_name='get_msg', read_only=True)
+
+    class Meta:
+        model = SubCategory
+        fields = ['msg', 'profiles']
+
+    def get_msg(self, obj):
+        return 'successfully'
+
+    def get_profiles(self, obj):
+        services = Service.objects.filter(category_id=obj.id).values('owner_id', ).distinct()
+        profiles = [ProfileModel.objects.filter(id=service.get('owner_id')) for service in services]
+        data = []
+        for profile in profiles:
+            data.append(profile.values())
+        return data
+

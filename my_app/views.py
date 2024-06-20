@@ -2,17 +2,17 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 
-
+from app_category.models import SubCategory
 from .permissons import Cheak, IsOwner
 from .serializers import RegistrationSerializer, VerificationSerializer, CitySerializer, ProfileSerializer, \
-    LoginSerializer, ImageSerializer, VideoSerializer
+    LoginSerializer, ImageSerializer, VideoSerializer, GetProfileWithSubIdSerializer
 from .models import PhoneVerification, User, City, ProfileModel, ProfileVideoModel, ProfileImageModel
 from .utils import send_sms
 from rest_framework.viewsets import ModelViewSet
@@ -65,7 +65,6 @@ class VerifyView(CreateAPIView):
             code = serializer.validated_data['code']
             try:
                 otp = PhoneVerification.objects.get(phone=phone, code=code, is_active=True)
-                print(otp)
                 if otp.created_at >= timezone.now() - timedelta(minutes=2):
                     otp.is_active = False
                     otp.save()
@@ -151,6 +150,28 @@ class ProfileViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class GetMyProfileView(ListAPIView):
+    queryset = ProfileModel.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().filter(user_id=request.user.id))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class GetProfileWithSubId(RetrieveAPIView):
+    queryset = SubCategory.objects.all()
+    serializer_class = GetProfileWithSubIdSerializer
 
 
 class ImageViewSet(ModelViewSet):

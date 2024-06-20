@@ -4,12 +4,12 @@ from .models import User, City, ProfileModel, ProfileVideoModel, ProfileImageMod
 
 
 class UserAdmin(BaseUserAdmin):
-    list_display = ('phone', 'city', 'is_admin')
-    list_filter = ('is_admin',)
+    list_display = ('phone', 'city', 'is_staff')
+    list_filter = ('is_staff',)
     fieldsets = (
         (None, {'fields': ('phone', 'password')}),
         ('Personal info', {'fields': ('city',)}),
-        ('Permissions', {'fields': ('is_admin',)}),
+        ('Permissions', {'fields': ('is_staff',)}),
     )
     add_fieldsets = (
         (None, {
